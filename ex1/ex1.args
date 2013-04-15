@@ -1,0 +1,11 @@
+-toggle=include_local_symbols=1
+-profile
+-sim
+-a6
+-memext=0,0x1fff
+-memext=0x4000,0xffff
+-toggle=deadbeef=1
+-simextp=/home/embsys/extensions/embsys_7segments.so
+-simextp=/home/embsys/extensions/embsys_clock.so
+-simextp=/home/embsys/extensions/embsys_uart.so
+-mem=0
