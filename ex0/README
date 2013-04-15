@@ -1,0 +1,109 @@
+I.
+Benjamin FEDIDAT, ID: 7665692
+Avramm WALLER, ID: 035839703
+
+II.
+1. Modify executes a bubble sort on "list", which is an int array: there are two nested loops that compare elements and swap them if they are unsorted, in a fashion that sorts "list".
+
+2. When the code finishes running, after the main's "return 0", the program calls the exit function, and after some cleanup goes into an infinite nop loop.
+
+3. According to elfdump on ex0.out, size of replace from 0x00010104: 10 bytes, size of modify from 0x00010110: 98 bytes, size of main from 0x00010174: 22 bytes, total of 134, total size of program: (size of .text section) 3640 bytes". Cause of difference: startup code, cleaup code, exit code, libraries, padding, etc.
+
+4. The C files are in the folder. The section header dumps are below, together with a short explanation of sections in paragraph e.
+
+	a. embsys@embsysVM:~/Desktop/ex0$ objdump only_text.out -h
+
+	only_text.out:     file format elf32-i386
+
+	Sections:
+	Idx Name          Size      VMA       LMA       File off  Algn
+	  0 .note.gnu.build-id 00000024  080480b4  080480b4  000000b4  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  1 .rel.plt      00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  2 .plt          00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  3 .text         00000017  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  4 .got.plt      00000000  080490f0  080490f0  000000f0  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  5 .comment      00000023  00000000  00000000  000000f0  2**0
+		          CONTENTS, READONLY
+
+	b. embsys@embsysVM:~/Desktop/ex0$ objdump text_rodata.out -h
+
+	text_rodata.out:     file format elf32-i386
+
+	Sections:
+	Idx Name          Size      VMA       LMA       File off  Algn
+	  0 .note.gnu.build-id 00000024  080480b4  080480b4  000000b4  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  1 .rel.plt      00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  2 .plt          00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  3 .text         00000017  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  4 .rodata       00000004  080480f0  080480f0  000000f0  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  5 .got.plt      00000000  080490f4  080490f4  000000f4  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  6 .comment      00000023  00000000  00000000  000000f4  2**0
+		          CONTENTS, READONLY
+
+	c. embsys@embsysVM:~/Desktop/ex0$ objdump text_rodata_data.out -h
+
+	text_rodata_data.out:     file format elf32-i386
+
+	Sections:
+	Idx Name          Size      VMA       LMA       File off  Algn
+	  0 .note.gnu.build-id 00000024  080480b4  080480b4  000000b4  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  1 .rel.plt      00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  2 .plt          00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  3 .text         00000017  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  4 .rodata       00000004  080480f0  080480f0  000000f0  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  5 .got.plt      00000000  080490f4  080490f4  000000f4  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  6 .data         00000004  080490f4  080490f4  000000f4  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  7 .comment      00000023  00000000  00000000  000000f8  2**0
+		          CONTENTS, READONLY
+
+	d. embsys@embsysVM:~/Desktop/ex0$ objdump all_sections.out -h
+
+	all_sections.out:     file format elf32-i386
+
+	Sections:
+	Idx Name          Size      VMA       LMA       File off  Algn
+	  0 .note.gnu.build-id 00000024  080480b4  080480b4  000000b4  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  1 .rel.plt      00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  2 .plt          00000000  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  3 .text         00000017  080480d8  080480d8  000000d8  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, CODE
+	  4 .rodata       00000004  080480f0  080480f0  000000f0  2**2
+		          CONTENTS, ALLOC, LOAD, READONLY, DATA
+	  5 .got.plt      00000000  080490f4  080490f4  000000f4  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  6 .data         00000004  080490f4  080490f4  000000f4  2**2
+		          CONTENTS, ALLOC, LOAD, DATA
+	  7 .bss          00000004  080490f8  080490f8  000000f8  2**2
+		          ALLOC
+	  8 .comment      00000023  00000000  00000000  000000f8  2**0
+		          CONTENTS, READONLY
+
+	e. As explained during the lesson, each section has a given role: TEXT contains executable code, BSS contains read+write uninitialized data, LIT (rodata here) contains read-only data i.e constant variables, and DATA contains initialized writable data (global variables).
+
+5. Here are the answers to the bonus questions, as far as we can tell: 
+a. Register 13 implements the variable out: ex0.dbg.s implements the line with out=0 as "push	%r13; .cfa_push	{%r13}	brle.d	%r1,0,.LN02.11", also the disassembly dump displays r13 being taken and used for out, and registers always displays the value of out.
+b. This question is less simple than it seems. Register 8 (one of the temp register) implements "in" at modify+0x10 just for the purpose of comparing it to "size". After that, the program is optimized to make it useless to keep "in" in its registers, by using two tricks.
+First, lp_count at modify+0x24 tells the program to loop from that address to modify+0x48 (the equivalent of in++) for "size-in" times (e.g if size=8 and in=5, then 3 times): this optimization makes it useless to check the loop's "in<size" condition at each iteration.
+Additionally, the program keeps list+in (i.e list[in]) in r4 and increments it at modify+0x44 at each iteration, making it useless to compute list[in] every time. Since "in" isn't used anywhere in the loop except through list[in], we don't need to keep it by itself anywhere. 
+**To sum it up**, "in" is shortly implemented by r8 and then isn't implemented by any registers inside the loop, except through "list+in" in r4. It might be worth noting that r7 holds "list+in" as well because of "mov %r7, %r4" at modify+0x20 but, unlike r4, is incremented through a write-back at modify+0x2c: "ld.ab %r10,[%r7,4]".

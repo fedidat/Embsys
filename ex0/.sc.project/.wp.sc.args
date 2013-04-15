@@ -1,0 +1,5 @@
+location=out
+kind=expression
+mode=w
+condition_enabled=1
+cond=out==8
