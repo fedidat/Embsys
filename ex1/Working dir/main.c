@@ -1,56 +1,58 @@
 void writeHexDigit(char d, int isSecondDigit)
 {
-	unsigned int symbol;
+	unsigned int symbol, 
+		LED_A = 1, LED_B = 2, LED_C = 4, LED_D = 8,
+		LED_E = 16, LED_F = 32, LED_G = 64;
 	switch(d)
 	{
-	case 0:
+	case 0x0:
 	default:
-		symbol = 63;
+		symbol = LED_A | LED_B | LED_C | LED_D | LED_E | LED_F;
 		break;
-	case 1:
-		symbol = 6;
+	case 0x1:
+		symbol = LED_B | LED_C;
 		break;
-	case 2:
-		symbol = 91;
+	case 0x2:
+		symbol = LED_A | LED_B | LED_D | LED_E | LED_G;
 		break;
-	case 3:
-		symbol = 79;
+	case 0x3:
+		symbol = LED_A | LED_B | LED_C | LED_D | LED_G;
 		break;
-	case 4:
-		symbol = 102;
+	case 0x4:
+		symbol = LED_B | LED_C | LED_F | LED_G;
 		break;
-	case 5:
-		symbol = 109;
+	case 0x5:
+		symbol = LED_A | LED_C | LED_D | LED_F | LED_G;
 		break;
-	case 6:
-		symbol = 125;
+	case 0x6:
+		symbol = LED_A | LED_C | LED_D | LED_E | LED_F | LED_G;
 		break;
-	case 7:
-		symbol = 7;
+	case 0x7:
+		symbol = LED_A | LED_B | LED_C;
 		break;
-	case 8:
-		symbol = 127;
+	case 0x8:
+		symbol = LED_A | LED_B | LED_C | LED_D | LED_E | LED_F | LED_G;
 		break;
-	case 9:
-		symbol = 111;
+	case 0x9:
+		symbol = LED_A | LED_B | LED_C | LED_D | LED_F | LED_G;
 		break;
-	case 10:
-		symbol = 119;
+	case 0xa:
+		symbol = LED_A | LED_B | LED_C | LED_E | LED_F | LED_G;
 		break;
-	case 11:
-		symbol = 124;
+	case 0xb:
+		symbol = LED_C | LED_D | LED_E | LED_F | LED_G;
 		break;
-	case 12:
-		symbol = 57;
+	case 0xc:
+		symbol = LED_A | LED_D | LED_E | LED_F;
 		break;
-	case 13:
-		symbol = 94;
+	case 0xd:
+		symbol = LED_B | LED_C | LED_D | LED_E | LED_G;
 		break;
-	case 14:
-		symbol = 121;
+	case 0xe:
+		symbol = LED_A | LED_D | LED_E | LED_F | LED_G;
 		break;
-	case 15:
-		symbol = 113;
+	case 0xf:
+		symbol = LED_A | LED_E | LED_F | LED_G;
 		break;
 	}
 	_sr(symbol + isSecondDigit*128, 0x104);
@@ -62,8 +64,7 @@ int main()
 	while(1)
 	{
 		T = _lr(0x100);
-		if((T - last >= 0 && T - last >= 100)
-			|| (T - last < 0 && T - last <= -100))
+		if(T - last >= 100)
 		{
 			C = (C + 1) % 256;
 			writeHexDigit(C%16, 0);
