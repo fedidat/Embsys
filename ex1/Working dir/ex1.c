@@ -4,6 +4,13 @@
 
 int main()
 {
+	char c;
+	embsys_uart_init();
+	while(1)
+	{
+		if(embsys_uart_receive(&c))
+			embsys_uart_send(c);
+	}
 	int time = 0, last = 0, C = 0, T = 100;
 	while(1)
 	{

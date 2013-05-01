@@ -34,7 +34,7 @@ static const int digits[16] = {
 
 void embsys_7segments_write(char value) {
 	/* set unit digit, lower nibble */
-	_sr(UNITS_DIGIT | digits[(value & 0x0F)], SEVEN_SEGMENTS_ADDR);
+	_sr(UNITS_DIGIT | digits[(value & 0x0F)], EMBSYS_7SEGMENTS_ADDR);
 	/* set tens digit, upper nibble */
-	_sr(TENS_DIGIT | digits[(value >> 4) & 0x0F], SEVEN_SEGMENTS_ADDR);
+	_sr(TENS_DIGIT | digits[(value >> 4) & 0x0F], EMBSYS_7SEGMENTS_ADDR);
 }
