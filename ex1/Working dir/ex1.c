@@ -4,14 +4,9 @@
 
 int main()
 {
+	int time = 0, last = 0, C = 0, T = 100;
 	char c;
 	embsys_uart_init();
-	while(1)
-	{
-		if(embsys_uart_receive(&c))
-			embsys_uart_send(c);
-	}
-	int time = 0, last = 0, C = 0, T = 100;
 	while(1)
 	{
 		time = embsys_clock_read();
@@ -21,6 +16,8 @@ int main()
 			embsys_7segments_write(C);
 			last = time;
 		}
+		if(embsys_uart_receive(&c))
+			embsys_uart_send(c);
 	}
 	return 0;
 }
