@@ -1,6 +1,5 @@
 #include "embsys_7segments.h"
 
-/* bits 0-6 define segments to be turned on */
 #define LED_A (1 << 0)
 #define LED_B (1 << 1)
 #define LED_C (1 << 2)
@@ -13,7 +12,8 @@
 #define UNITS_DIGIT (0 << 7)
 #define TENS_DIGIT (1 << 7)
 
-static const int digits[16] = {
+static const int digits[16] =
+{
 	/* 0 */ LED_A | LED_B | LED_C | LED_D | LED_E | LED_F,
 	/* 1 */         LED_B | LED_C,
 	/* 2 */ LED_A | LED_B         | LED_D | LED_E         | LED_G,
@@ -32,9 +32,10 @@ static const int digits[16] = {
 	/* f */ LED_A                         | LED_E | LED_F | LED_G
 };
 
-void embsys_7segments_write(char value) {
-	/* set unit digit, lower nibble */
+void embsys_7segments_write(char value)
+{
+	/*set unit digit, lower nibble*/
 	_sr(UNITS_DIGIT | digits[(value & 0x0F)], EMBSYS_7SEGMENTS_ADDR);
-	/* set tens digit, upper nibble */
+	/*set tens digit, upper nibble*/
 	_sr(TENS_DIGIT | digits[(value >> 4) & 0x0F], EMBSYS_7SEGMENTS_ADDR);
 }

@@ -1,9 +1,11 @@
 #ifndef EMBSYS_UART_H_
 #define EMBSYS_UART_H_
 
-typedef volatile union {
+typedef volatile union 
+{
 	unsigned char lcr_val;
-	struct {
+	struct 
+	{
 		unsigned char word_length : 2;
 		unsigned char stop_bit : 1;
 		unsigned char parity : 3;
@@ -13,9 +15,11 @@ typedef volatile union {
 	} bits;
 } lcr_t;
 
-typedef volatile union {
+typedef volatile union 
+{
 	unsigned char mcr_val;
-	struct {
+	struct 
+	{
 		unsigned char data_terminal_ready : 1;
 		unsigned char request_to_send : 1;
 		unsigned char aux_out1 : 1;
@@ -26,9 +30,11 @@ typedef volatile union {
 	} bits;
 } mcr_t;
 
-typedef volatile union {
+typedef volatile union 
+{
 	unsigned char lsr_val;
-	struct {
+	struct 
+	{
 		unsigned char data_ready : 1;
 		unsigned char overrun_err : 1;
 		unsigned char parity_err : 1;
@@ -56,6 +62,6 @@ void embsys_uart_init();
 
 unsigned char embsys_uart_receive(unsigned char* byte);
 
-unsigned char embsys_uart_send(unsigned char byte);
+int embsys_uart_send(unsigned char byte);
 
 #endif /*EMBSYS_UART_H_*/
