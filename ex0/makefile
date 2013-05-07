@@ -23,6 +23,6 @@ all_sections.out: all_sections.c
 	gcc all_sections.c -o all_sections.out -nostdlib
 
 tar:
-	tar cvf fedidat_waller.tar ex0.c makefile README only_text.c text_rodata.c text_rodata_data.c all_sections.c
+	tar cvf ex0.tar ex0.c makefile README only_text.c text_rodata.c text_rodata_data.c all_sections.c
 clean:
 	rm -f ex0.s ex0.out ex0.map ex0.dbg.s ex0.dbg.out only_text.out text_rodata.out text_rodata_data.out all_sections.out
