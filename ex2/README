@@ -1,0 +1,20 @@
+Benjamin FEDIDAT 7665692
+Avramm WALLER 035839703
+
+Embedded Systems, JCT 2013, exercise 1
+
+Usage:
+make
+runac ex1.out $(<ex1.args) (or mdb)
+
+Contents:
+README                - this file
+Makefile
+ex1.c                 - main file
+embsys_uart.c/h       - driver that handles the UART module
+embsys_clock.c/h      - driver that reads the clock
+embsys_7segments.c/h  - driver that controls the seven segments module
+embsys_uart_queue.c/h - receiving queue for the UART requests, allows asynchronous action
+ex1.args              - simulation arguments
+ex1.ld                - memory mapping file.
+
