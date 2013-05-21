@@ -9,7 +9,7 @@ CFLAGS = -g
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) $^ -o $@ ex2.ld
+	$(CC) $(CFLAGS) $^ -o $@ ex2.ld ex2_ivt.s
 	
 tar:
 	tar cvf ex1.tar makefile README $(FILES)

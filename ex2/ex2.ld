@@ -9,6 +9,7 @@ MEMORY {
 
 SECTIONS {
          GROUP: {
+         	INTERRUPT_TABLE: {}
                 * (TEXT) : {}
                 * (LIT) : {}
          } > ROM

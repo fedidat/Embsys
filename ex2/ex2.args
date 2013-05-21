@@ -8,5 +8,6 @@
 -simextp=/home/embsys/extensions/embsys_7segments.so
 -simextp=/home/embsys/extensions/embsys_uart.so
 -simextp=/home/embsys/extensions/embsys_flash.so
--simextp=/home/embsys/extensions/embsys_pager.so
+#-simextp=/home/embsys/extensions/embsys_pager.so
 -mem=0
+
