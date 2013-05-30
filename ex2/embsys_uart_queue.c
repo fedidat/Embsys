@@ -1,19 +1,20 @@
 #include "embsys_uart_queue.h"
 
-Queue* InitQueue(Queue* Q) 
+Queue* InitQueue(Queue* Q, unsigned char* queueArray, int arraySize) 
 {
 	/*init queue: size 0, front 1, rear 0*/
 	Q->Size = 0;
 	Q->Front = 0;
 	Q->Rear = 0;
-	Q->Capacity = QueueSize;
+	Q->Capacity = arraySize;
+	Q->Array = queueArray;
 	return Q;
 }
 
 int Next(int Value, Queue* Q) 
 {
 	/*returns the place of the next elements in queue*/
-	if(++Value == QueueSize)
+	if(++Value == Q->Capacity)
 		Value = 0;
 	return Value;
 }
@@ -28,11 +29,11 @@ void Enqueue(unsigned char X, Queue* Q)
 	Q->Rear = Next(Q->Rear, Q);
 }
 
-void EnqueueString(char* X, Queue* Q)
+void EnqueueString(char* X, unsigned int length, Queue* Q)
 {
 	/*enqueue elements one by one*/
 	int i;
-	for(i=0; X[i]; i++)
+	for(i=0; i<length; i++)
 		Enqueue((unsigned char)X[i], Q);
 }
 
