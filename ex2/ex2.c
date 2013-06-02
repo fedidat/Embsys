@@ -8,7 +8,6 @@
 #define MAX_MESSAGE_SIZE 1024+5
 #define MAX_QUEUED_MESSAGES 5
 #define CYCLES_PER_UNIT 100000
-#define FLASH_BLOCK_SIZE 4000
 
 /* protoypes */
 void embsys_init();
@@ -124,7 +123,7 @@ int process_request(unsigned char* request)
 	{
 		if(embsys_flash_busy())
 			return 0;
-		/* read flash */
+		/* get address and size and read flash */
 		unsigned int startAddr = hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
 			| hexToDec(request[4]) << 4 | hexToDec(request[5]);
 		unsigned int size = hexToDec(request[6]) << 12 | hexToDec(request[7]) << 8
@@ -136,20 +135,21 @@ int process_request(unsigned char* request)
 	{
 		if(embsys_flash_busy())
 			return 0;
-		/* write flash */
-		unsigned int startAddr = hexToDec(request[2]) << 4 | hexToDec(request[3]);
+		/* get address, check buffer integrity, then write flash */
+		unsigned int startAddr = hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
+			| hexToDec(request[4]) << 4 | hexToDec(request[5]);
 		int count;
 		unsigned char buffer[512];
-		for(count = 0; request[4+count] != '.'; count+=2)
+		for(count = 0; request[6+count*2] != '.'; count++)
 		{
-			if(!isCharHex(request[4+count]) || !isCharHex(request[4+count+1])
+			if(!isCharHex(request[6+count*2]) || !isCharHex(request[6+count*2+1]))
 			{
 				enqueue_string("ZZ.", 3, &sendQueue);
 				return 1;
 			}
-			buffer[count] = hexToDec(request[4+count]) << 4 | hexToDec(4+count+1);
+			buffer[count] = hexToDec(request[6+count*2]) << 4 | hexToDec(request[6+count*2+1]);
 		}
-		if(request[4+count] == '.')
+		if(request[6+count*2] == '.')
 		{
 			embsys_flash_write(startAddr, count, buffer);
 			return 1;
@@ -164,13 +164,14 @@ int process_request(unsigned char* request)
 		return 1;
 	}
 	if(request[0] == 'E' && request[1] == 'B' && isCharHex(request[2]) && isCharHex(request[3])
-		&& request[4] == '.')
+		&& isCharHex(request[4]) && isCharHex(request[5]) && request[6] == '.')
 	{
 		if(embsys_flash_busy())
 			return 0;
-		/* erase block */
-		unsigned int position = hexToDec(request[2]) << 4 | hexToDec(request[3]);
-		embsys_flash_delete(position * FLASH_BLOCK_SIZE);
+		/* get start address then erase block */
+		unsigned int startAddr = hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
+			| hexToDec(request[4]) << 4 | hexToDec(request[5]);
+		embsys_flash_delete(startAddr);
 		return 1;
 	}
 	if(request[0] == 'S' && request[1] == 'S' && isCharHex(request[2]) && isCharHex(request[3])
@@ -192,7 +193,7 @@ int process_request(unsigned char* request)
 		/* set timer */
 		int cycles = (char)(hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
 			| hexToDec(request[4]) << 4 | hexToDec(request[5]));
-		unsigned int isPeriodic = (unsigned int)(hexToDec(request[6]) << 4 | hexToDec(request[7]);
+		unsigned int isPeriodic = (unsigned int)(hexToDec(request[6]) << 4 | hexToDec(request[7]));
 		if(isPeriodic == 0 || isPeriodic == 1)
 		{
 			embsys_timer_set(cycles * CYCLES_PER_UNIT, isPeriodic);

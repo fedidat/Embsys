@@ -16,8 +16,11 @@ tar:
 	tar cvf ex2.tar makefile README $(FILES)
 	
 run:
+	runac $(TARGET) @$(ARGS)
+	
+debug:
 	mdb $(TARGET) @$(ARGS)
 
 clean:
-	rm $(OBJECTS) $(TARGET) ex2_ivt.o
+	rm $(OBJECTS) $(TARGET) ex2_ivt.o embsys_flash.img
 
