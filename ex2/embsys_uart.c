@@ -1,5 +1,23 @@
 #include "embsys_uart.h"
 
+#define UART_BASE_ADDRESS 0x100000
+
+/* UART Registers */
+typedef volatile union 
+{
+	unsigned char ier_val;
+	struct 
+	{
+		unsigned char received_data_interrupt : 1;
+		unsigned char thr_empty_interrupt : 1;
+		unsigned char rls_interrupt : 1;
+		unsigned char modem_status_interrupt : 1;
+		unsigned char sleep_mode : 1;
+		unsigned char low_power_mod : 1;
+		unsigned char reserved : 2;
+	} bits;
+} ier_t;
+
 typedef volatile union 
 {
 	unsigned char lcr_val;
@@ -13,21 +31,6 @@ typedef volatile union
 
 	} bits;
 } lcr_t;
-
-typedef volatile union 
-{
-	unsigned char mcr_val;
-	struct 
-	{
-		unsigned char data_terminal_ready : 1;
-		unsigned char request_to_send : 1;
-		unsigned char aux_out1 : 1;
-		unsigned char aux_out2 : 1;
-		unsigned char loopback_mode : 1;
-		unsigned char autoflow_control : 1;
-		unsigned char reserved : 2;
-	} bits;
-} mcr_t;
 
 typedef volatile union 
 {
@@ -48,72 +51,70 @@ typedef volatile union
 typedef volatile struct
 {
 	unsigned char thr_rbr_dll;
-	unsigned char ier_dlh;
+	ier_t ier_dlh;
 	unsigned char iir_fcr;
 	lcr_t lcr;
-	mcr_t mcr;
+	unsigned char mcr;
 	lsr_t lsr;
 	unsigned char msr;
 	unsigned char sr;
 } uart_registers;
 
+/* Interrupts */
 uart_registers *uart;
-
 void (*pUARTCallback)(void);
 
+/* Called upon receiving a character, as set in the init function */
+_Interrupt1 void uart_isr()
+{
+	/* invoke callback */
+	(*pUARTCallback)();
+}
+
+/* Stores the callback and the UART extension parameters */
 void embsys_uart_init(void (*callback)()) 
 {
+	/* store callback */
 	pUARTCallback = callback;
 	
 	/*get uart memory-mapping address*/
-	uart = (uart_registers *) 0x100000;
+	uart = (uart_registers *) UART_BASE_ADDRESS;
 
-	/*set baud rate to 19200bps*/
+	/* set baud rate to 19200bps */
 	uart->lcr.bits.dlab = 1;
-	/*115200bps / 19200 = 0x06*/
-	uart->thr_rbr_dll = 6; 
-	uart->ier_dlh = 0;
+	uart->thr_rbr_dll = 6; /* 115200bps / 19200 = 0x06 */
 
-	/*set link parameters: 8 bits data, no parity, 1 stop bit, no autoflow control*/
+	/* set link parameters: 8 bits data, no parity, 1 stop bit, no autoflow control */
 	uart->lcr.bits.dlab = 0;
-	uart->ier_dlh = 0;
 	uart->iir_fcr = 0;
-	uart->mcr.mcr_val = 0;
 	uart->lcr.bits.word_length = 3;
 	uart->lcr.bits.stop_bit = 0;
 	uart->lcr.bits.parity = 0;
-	uart->mcr.bits.autoflow_control = 0;
+	
+	/* enable data-received interrupt */
+	uart->lcr.bits.dlab = 0;
+	uart->ier_dlh.bits.received_data_interrupt = 1;
 
 }
 
-unsigned char embsys_uart_receive(unsigned char* byte) 
+/* Receives one character over UART */
+void embsys_uart_receive(unsigned char* byte) 
 {
-	/*check if data received, and if yes, save byte*/
-	if(!uart->lsr.bits.data_ready)
-		return 0;
-	else
-	{
-		*byte = uart->thr_rbr_dll;
-		return 1;
-	}
+	/* interrupt received, directly read from the buffer */
+	*byte = uart->thr_rbr_dll;
 }
 
+/* Sends one character over UART */
 int embsys_uart_send(unsigned char byte) 
 {
-	/*check if line available, and if yes, write byte*/
+	/*check if line available, and if it is, write byte*/
 	if(!uart->lsr.bits.thr_emp)
 		return 0;
 	else
 	{
 		uart->thr_rbr_dll = byte;
+		while(!uart->lsr.bits.dhr_emp);
 		return 1;
 	}
 }
-
-_Interrupt1 void uart_isr()
-{
-	(*pUARTCallback)();
-}
-
-
 

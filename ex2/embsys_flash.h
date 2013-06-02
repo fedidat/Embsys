@@ -4,11 +4,10 @@
 typedef unsigned int Address; 
 
 /* Interrupts */
-void embsys_flash_init(void (*callback)());
-_Interrupt1 void flash_isr();
+void embsys_flash_init(void (*callback)(), void (*readCallback)(unsigned char* buffer, int count));
 
 /* Reads from a given address to a buffer */
-void embsys_flash_read(Address addr, int count, unsigned char *buff);
+void embsys_flash_read(Address addr, int count);
 
 /* Copy a buffer to the flash */
 void embsys_flash_write(Address addr, int count, unsigned char *buff);
@@ -18,5 +17,8 @@ void embsys_flash_delete(Address addr);
 
 /* Clears the flash */
 void embsys_flash_delete_all();
+
+/* Checks if flash is busy */
+int embsys_flash_busy();
 
 #endif /*EMBSYS_FLASH_H_*/

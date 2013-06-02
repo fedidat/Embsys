@@ -5,7 +5,7 @@
 #include "embsys_flash.h"
 #include "embsys_timer.h"
 
-#define MAX_MESSAGE_SIZE 1024+5
+#define MAX_MESSAGE_SIZE 517
 #define MAX_QUEUED_MESSAGES 5
 #define CYCLES_PER_UNIT 100000
 #define FLASH_BLOCK_SIZE 4000
@@ -76,7 +76,7 @@ void flash_read_interrupt(unsigned char* buffer, int count)
 void receive_request_byte(char receivedChar)
 {
 	receiveBuffer[bytesReceived++] = receivedChar;
-	if(bytesReceived == MAX_MESSAGE_SIZE + 5)
+	if(bytesReceived == 517)
 	{
 		/* queue up error message because too long */
 		enqueue_string("ZZ.", 3, &sendQueue);
@@ -119,16 +119,13 @@ void process_queue_head()
 int process_request(unsigned char* request)
 {
 	if(request[0] == 'R' && request[1] == 'F' && isCharHex(request[2]) && isCharHex(request[3])
-		&& isCharHex(request[4]) && isCharHex(request[5]) && isCharHex(request[6]) && isCharHex(request[7])
-		&& isCharHex(request[8]) && isCharHex(request[9]) && request[10] == '.')
+		&& isCharHex(request[4]) && isCharHex(request[5]) && request[6] == '.')
 	{
 		if(embsys_flash_busy())
 			return 0;
 		/* read flash */
-		unsigned int startAddr = hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
-			| hexToDec(request[4]) << 4 | hexToDec(request[5]);
-		unsigned int size = hexToDec(request[6]) << 12 | hexToDec(request[7]) << 8
-			| hexToDec(request[8]) << 4 | hexToDec(request[9]);
+		unsigned int startAddr = hexToDec(request[2]) << 4 | hexToDec(request[3]);
+		unsigned int size = hexToDec(request[4]) << 4 | hexToDec(request[5]);
 		embsys_flash_read(startAddr, size);
 		return 1;
 	}
@@ -139,19 +136,10 @@ int process_request(unsigned char* request)
 		/* write flash */
 		unsigned int startAddr = hexToDec(request[2]) << 4 | hexToDec(request[3]);
 		int count;
-		unsigned char buffer[512];
-		for(count = 0; request[4+count] != '.'; count+=2)
-		{
-			if(!isCharHex(request[4+count]) || !isCharHex(request[4+count+1])
-			{
-				enqueue_string("ZZ.", 3, &sendQueue);
-				return 1;
-			}
-			buffer[count] = hexToDec(request[4+count]) << 4 | hexToDec(4+count+1);
-		}
+		for(count = 0; request[4+count] != '.'; count++);
 		if(request[4+count] == '.')
 		{
-			embsys_flash_write(startAddr, count, buffer);
+			embsys_flash_write(startAddr, count, &request[4]);
 			return 1;
 		}
 	}
@@ -174,25 +162,19 @@ int process_request(unsigned char* request)
 		return 1;
 	}
 	if(request[0] == 'S' && request[1] == 'S' && isCharHex(request[2]) && isCharHex(request[3])
-		&& isCharHex(request[4]) && isCharHex(request[5]) && request[6] == '.')
+		&& request[4] == '.')
 	{
 		/* seven segments */
-		char MSB = hexToDec(request[2]) << 4 | hexToDec(request[3]);
-		char LSB = hexToDec(request[4]) << 4 | hexToDec(request[5]);
-		char value = MSB << 4 | LSB;
-		if(value < 256)
-		{
-			embsys_7segments_write(value);
-			return 1;
-		}
+		char value = (char)(hexToDec(request[2]) << 4 | hexToDec(request[3]));
+		embsys_7segments_write(value);
+		return 1;
 	}
-	if(request[0] == 'S' && request[1] == 'T' && isCharHex(request[2]) && isCharHex(request[3])
-		&& isCharHex(request[4]) && isCharHex(request[5]) &&request[8] == '.')
+	if(request[0] == 'S' && request[1] == 'T'&& isCharHex(request[2]) && isCharHex(request[3])
+		&& (hexToDec(request[4]) == 0 || hexToDec(request[4] == 1)) &&request[5] == '.')
 	{
 		/* set timer */
-		int cycles = (char)(hexToDec(request[2]) << 12 | hexToDec(request[3]) << 8
-			| hexToDec(request[4]) << 4 | hexToDec(request[5]));
-		unsigned int isPeriodic = (unsigned int)(hexToDec(request[6]) << 4 | hexToDec(request[7]);
+		char cycles = (char)(hexToDec(request[2]) << 4 | hexToDec(request[3]));
+		unsigned int isPeriodic = (unsigned int)hexToDec(request[4]);
 		if(isPeriodic == 0 || isPeriodic == 1)
 		{
 			embsys_timer_set(cycles * CYCLES_PER_UNIT, isPeriodic);

@@ -11,21 +11,29 @@ struct QueueRecord
 };
 typedef struct QueueRecord Queue;
 
-Queue* InitQueue(Queue* Q, unsigned char* queueArray, int arraySize);
+/* Stores the array pointer */
+Queue* init_queue(Queue* Q, unsigned char* queueArray, int arraySize);
 
-int Next(int Value, Queue* Q);
+/* Returns the next value */
+int next(int Value, Queue* Q);
 
-void Enqueue(unsigned char X, Queue* Q);
+/* Enqueue one character */
+void enqueue(unsigned char X, Queue* Q);
 
-void EnqueueString(char* X, unsigned int length, Queue* Q);
+/* Enqueue one or several characters */
+void enqueue_string(char* X, unsigned int length, Queue* Q);
 
-void Dequeue(Queue* Q);
+/* Dequeue one character */
+void dequeue(Queue* Q);
 
-int IsFull(Queue* Q);
+/* Indicates if the queue is full */
+int is_full(Queue* Q);
 
-int IsEmpty(Queue* Q);
+/* Indicates if the queue is empty */
+int is_empty(Queue* Q);
 
-char Front(Queue* Q);
+/* Returns the front character */
+char front(Queue* Q);
 
 #endif /*EMBSYS_UART_QUEUE_H_*/
 

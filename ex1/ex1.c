@@ -38,7 +38,6 @@ int main()
 			if(bytesReceived == 4) 
 			{
 				process_request((message*)receiveBuffer, &sendQueue, &C, &T);
-				Enqueue('\n', &sendQueue);
 				bytesReceived = 0;
 			}
 		}

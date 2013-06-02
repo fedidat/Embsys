@@ -1,6 +1,7 @@
 #include "embsys_uart_queue.h"
 
-Queue* InitQueue(Queue* Q, unsigned char* queueArray, int arraySize) 
+/* Stores the array pointer: malloc doesn't work well */
+Queue* init_queue(Queue* Q, unsigned char* queueArray, int arraySize) 
 {
 	/*init queue: size 0, front 1, rear 0*/
 	Q->Size = 0;
@@ -11,7 +12,8 @@ Queue* InitQueue(Queue* Q, unsigned char* queueArray, int arraySize)
 	return Q;
 }
 
-int Next(int Value, Queue* Q) 
+/* Returns the next value */
+int next(int Value, Queue* Q) 
 {
 	/*returns the place of the next elements in queue*/
 	if(++Value == Q->Capacity)
@@ -19,44 +21,50 @@ int Next(int Value, Queue* Q)
 	return Value;
 }
 
-void Enqueue(unsigned char X, Queue* Q) 
+/* Enqueue one character */
+void enqueue(unsigned char X, Queue* Q) 
 {
 	/*if there is place available, advance rear, increment size and save element*/
-	if(IsFull(Q))
+	if(is_full(Q))
 		return;
 	Q->Size++;
 	Q->Array[Q->Rear] = X;
-	Q->Rear = Next(Q->Rear, Q);
+	Q->Rear = next(Q->Rear, Q);
 }
 
-void EnqueueString(char* X, unsigned int length, Queue* Q)
+/* Enqueue one or several characters */
+void enqueue_string(char* X, unsigned int length, Queue* Q)
 {
 	/*enqueue elements one by one*/
 	int i;
 	for(i=0; i<length; i++)
-		Enqueue((unsigned char)X[i], Q);
+		enqueue((unsigned char)X[i], Q);
 }
 
-void Dequeue(Queue* Q) 
+/* Dequeue one character */
+void dequeue(Queue* Q) 
 {
 	/*reverse of enqueue*/
-	if(IsEmpty(Q))
+	if(is_empty(Q))
 		return;
 	Q->Size--;
-	Q->Front = Next(Q->Front, Q);
+	Q->Front = next(Q->Front, Q);
 }
 
-int IsFull(Queue* Q) 
+/* Indicates if the queue is full */
+int is_full(Queue* Q) 
 {
 	return Q->Size == Q->Capacity;
 }
 
-int IsEmpty(Queue* Q) 
+/* Indicates if the queue is empty */
+int is_empty(Queue* Q) 
 {
 	return Q->Size == 0;
 }
 
-char Front(Queue* Q)
+/* Returns the front character */
+char front(Queue* Q)
 {
 	return Q->Array[Q->Front];
 }

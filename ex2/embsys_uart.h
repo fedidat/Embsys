@@ -1,13 +1,14 @@
 #ifndef EMBSYS_UART_H_
 #define EMBSYS_UART_H_
 
+/* Stores the callback and the UART extension parameters */
 void embsys_uart_init(void (*callback)());
 
-unsigned char embsys_uart_receive(unsigned char* byte);
+/* Receives one character over UART */
+void embsys_uart_receive(unsigned char* byte);
 
+/* Sends one character over UART */
 int embsys_uart_send(unsigned char byte);
-
-_Interrupt1 void uart_isr();
 
 #endif /*EMBSYS_UART_H_*/
 

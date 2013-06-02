@@ -10,15 +10,17 @@
 #define INTERRUPT_ENABLE 0x1
 #define INITIAL_VALUE 0x0
 
+/* Interrupts */
 int isPeriodic;
-
 void (*pTimerCallback)(void);
 
+/* Stores the callback */
 void embsys_timer_init(void (*callback)())
 {
 	pTimerCallback = callback;
 }
 
+/* Starts the timer and saves flag for periodicity */
 void embsys_timer_set(unsigned int cycles, int periodic)
 {
 	isPeriodic = periodic;
@@ -27,6 +29,7 @@ void embsys_timer_set(unsigned int cycles, int periodic)
 	_sr(INTERRUPT_ENABLE, TIMER_CONTROL);
 }
 
+/* Called after the timer expires, in interrupts are enabled */
 _Interrupt1 void timer_isr()
 {
 	if(isPeriodic == 0)

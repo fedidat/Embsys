@@ -1,20 +1,26 @@
+fedidat waller
+
+Names and IDs:
 Benjamin FEDIDAT 7665692
 Avramm WALLER 035839703
 
-Embedded Systems, JCT 2013, exercise 1
+Embedded Systems, JCT 2013, exercise 2
+
+Description: Control of flash, timer, 7 segments and UART using interrupts.
 
 Usage:
 make
-runac ex1.out $(<ex1.args) (or mdb)
+make run (or "mdb/runac ex2.out @ex2.args") 
 
 Contents:
 README                - this file
-Makefile
-ex1.c                 - main file
-embsys_uart.c/h       - driver that handles the UART module
-embsys_clock.c/h      - driver that reads the clock
+Makefile              - the makefile
+ex2.c                 - main file
+embsys_timer.c/h      - driver that reads the clock
 embsys_7segments.c/h  - driver that controls the seven segments module
-embsys_uart_queue.c/h - receiving queue for the UART requests, allows asynchronous action
-ex1.args              - simulation arguments
-ex1.ld                - memory mapping file.
-
+embsys_uart.c/h       - driver that handles the UART module
+embsys_uart_queue.c/h - receiving queue for the UART requests, keeps busy requests for later
+embsys_flash.c/h      - driver that handles the flash module
+ex2.args              - simulation arguments
+device.svr3           - memory mapping file.
+ex2_ivt               - interrupt vector table
