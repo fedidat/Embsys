@@ -1,0 +1,27 @@
+ROM_START = 0x0;
+ROM_SIZE = 32K;
+SRAM_START = 0x80000;
+SRAM_SIZE = 64K;
+STACK_SIZE = 5120;
+HEAP_SIZE = 5120;
+
+MEMORY {
+	ROM: ORIGIN = ROM_START,  LENGTH = ROM_SIZE
+	RAM: ORIGIN = SRAM_START, LENGTH = SRAM_SIZE
+}
+
+SECTIONS {
+         GROUP: {
+         	INTERRUPT_TABLE: {}
+                * (TEXT) : {}
+                * (LIT) : {}
+         } > ROM
+
+         GROUP: {
+                * (DATA) : {}
+                * (BSS) : {}
+                .stack SIZE(STACK_SIZE) : {}
+                .heap SIZE(HEAP_SIZE) : {}   
+         } > RAM
+}
+

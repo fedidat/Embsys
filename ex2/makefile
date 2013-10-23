@@ -23,4 +23,3 @@ debug:
 
 clean:
 	rm $(OBJECTS) $(TARGET) ex2_ivt.o embsys_flash.img
-

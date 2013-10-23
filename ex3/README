@@ -1,0 +1,55 @@
+fedidat waller
+
+Names and IDs:
+Benjamin FEDIDAT 7665692
+Avramm WALLER 035839703
+ 
+Embedded Systems, JCT 2013, exercise 3
+Description: SMS protocol, network, input panel, display, ThreadX.
+
+Usage:
+"make", then "make debug" or "make run"
+
+Contents: 
+	README						- this file 
+	makefile     				- a makefile
+	device.svr3					- segment memory map
+	ivt.s						- interrupt vector table
+	ex3.c						- main program
+    embsys_utilities.c/h        - tools used accross the files
+	embsys_timer.c/h			- timer driver
+	embsys_panel.c/h			- input panel driver
+	embsys_display.c/h			- display driver
+	embsys_network.c/h			- network card driver
+	embsys_sms_protocol.c/h		- sms protocol implementation
+	embsys_sms.c/h				- implementation of the sms module for the device
+	embsys_uart.c/h				- UART driver
+	embsys_uart_queue.c/h		- queue for use with UART characters
+	embsys_sms_slave.c/h		- device slave mode implementation using UART queues
+	tx.a						- ThreadX compiled and linked library
+	tx_api.h					- ThreadX API
+	tx_port.h					- port of ThreadX for ARC enviroment
+	ex3.args					- arguments for debugging with mdb
+	
+Notes:
+
+BONUS 1: rewrite the SMS protocol source, 10 pts, DONE. (with some help...)
+BONUS 2: slave mode, 15 pts, DONE.
+
+Our device ID is 07665692
+
+There are 5 threads:
+Display thread          - renders the display
+Input panel thread		- reacts to the pad button presses
+Receive network thread 	- receives incoming packets
+Send network thread 	- sends SMS relevant data accross the network
+UART send thread		- sends characters to the device's master using UART
+
+Slave mode:
+- As Uri said, timestamp time without date is good.
+- Also, no need for outgoing message timestamp (not present in SMS_DELIVER), zeros are sent instead.
+- Everything is in half bytes. For example, sending an SMS to address "01010101"
+  with the text "aaaa" is done this way: "SM 08 0002000200020002 04 61616161." (without quotes/spaces)
+  In the same way, an incoming SMS of index 1 at 05:41:36 from "0" to "02020202" with the message "test" 
+  will be: "MC 01 054136 08 0002000200020002 01 00 04 74657374."
+

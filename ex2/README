@@ -10,7 +10,7 @@ Description: Control of flash, timer, 7 segments and UART using interrupts.
 
 Usage:
 make
-make run (or "mdb/runac ex2.out @ex2.args") 
+make debug/run (or "mdb/runac a.out @a.args") 
 
 Contents:
 README                - this file

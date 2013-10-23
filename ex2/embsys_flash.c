@@ -83,32 +83,24 @@ void run_spi(int cmd, int count) {
 
 void flash_transfer_data(unsigned char direction, int count, unsigned char* data) 
 {
-	int addr = FLASH_FDATA;
-	int data_pos = 0, tmp_pos, i;
-	char tmp[4];
+	unsigned int data_pos = 0, i;
 	if (direction == STORE_DATA) 
-	{
-		/* copy 4 bytes at a time */
-		for(; count > 0; count -=4, addr++) 
-		{
-			tmp_pos = 0;
-			for(i=0; i<count; i++)
-				tmp[tmp_pos++] = data[data_pos++];
-			_sr(*((unsigned int*)tmp), addr);
-		}
+	{	
+		for(i = 0 , data_pos = 0 ; i < count ; i+=4 , ++data_pos)
+			_sr((*(unsigned int*)(data+i)),FLASH_FDATA+data_pos);
 	} 
 	else /* LOAD_DATA */
 	{
-		/* copy 4 bytes at a time */
-		for(; count > 0; count -=4, addr++) 
+		unsigned int j, regData;
+		unsigned char* pRegData = (unsigned char*)&regData;
+		while(i < count)
 		{
-			tmp_pos = 0;
-			*((unsigned int*)tmp) =  _lr(addr);
-			for(i=0; i<count; i++)
-				data[data_pos++] = tmp[tmp_pos++];
+			regData = _lr(FLASH_FDATA + data_pos);
+			for(j = 0; j < 4 && i < count; ++i, ++j)
+				data[i] = pRegData[j];
+			data_pos++;
 		}
 	}
-
 }
 
 void embsys_flash_read(Address addr, int count) 
@@ -122,6 +114,7 @@ void embsys_flash_read(Address addr, int count)
 	/* make first call */
 	embsys_flash_continue_read();
 }
+
 /* Reads from a given address to a buffer */
 void embsys_flash_continue_read() 
 {
@@ -168,6 +161,8 @@ void embsys_flash_continue_write()
 /* Delete a block of 4k at a given address */
 void embsys_flash_delete(Address addr) 
 {
+	/* note non-reading operation for callback */
+	isRead = 0;
 	_sr(addr & 0xFFFFF000, FLASH_FADDR);
 	run_spi(CMD_ERASE_BLOCK, 0);
 }
@@ -175,6 +170,8 @@ void embsys_flash_delete(Address addr)
 /* Clears the flash */
 void embsys_flash_delete_all() 
 {
+	/* note non-reading operation for callback */
+	isRead = 0;
 	run_spi(CMD_ERASE_ALL, 0);
 }
 

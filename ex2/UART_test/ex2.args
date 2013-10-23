@@ -1,0 +1,10 @@
+-toggle=include_local_symbols=1
+-profile
+-sim
+-a6
+-memext=0,0x3fff
+-memext=0x6000,0x11fff
+-toggle=deadbeef=1
+-simextp=/home/embsys/extensions/embsys_uart.so
+-mem=0
+-Xtimer0

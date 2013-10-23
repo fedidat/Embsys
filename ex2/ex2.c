@@ -67,7 +67,13 @@ void flash_interrupt()
 void flash_read_interrupt(unsigned char* buffer, int count)
 {
 	enqueue_string("RF", 2, &sendQueue);
-	enqueue_string((char*)buffer, count, &sendQueue);
+	for(int i=0; i<count; i++)
+	{
+		unsigned char upperHex = decToHex((unsigned int)buffer[i] >> 4);
+		enqueue(upperHex, &sendQueue);
+		unsigned char lowerHex = decToHex((unsigned int)buffer[i] & 0x0F);
+		enqueue(lowerHex, &sendQueue);
+	}
 	enqueue_string(".", 1, &sendQueue);
 }
 
@@ -147,7 +153,8 @@ int process_request(unsigned char* request)
 				enqueue_string("ZZ.", 3, &sendQueue);
 				return 1;
 			}
-			buffer[count] = hexToDec(request[6+count*2]) << 4 | hexToDec(request[6+count*2+1]);
+			int a = hexToDec(request[6+count*2]) << 4, b= hexToDec(request[6+count*2+1]);
+			buffer[count] = a | b;
 		}
 		if(request[6+count*2] == '.')
 		{
@@ -180,12 +187,8 @@ int process_request(unsigned char* request)
 		/* seven segments */
 		char MSB = hexToDec(request[2]) << 4 | hexToDec(request[3]);
 		char LSB = hexToDec(request[4]) << 4 | hexToDec(request[5]);
-		char value = MSB << 4 | LSB;
-		if(value < 256)
-		{
-			embsys_7segments_write(value);
-			return 1;
-		}
+		embsys_7segments_write(MSB, LSB);
+		return 1;
 	}
 	if(request[0] == 'S' && request[1] == 'T' && isCharHex(request[2]) && isCharHex(request[3])
 		&& isCharHex(request[4]) && isCharHex(request[5]) &&request[8] == '.')

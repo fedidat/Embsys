@@ -1,0 +1,12 @@
+-toggle=include_local_symbols=1
+-initiallog=logfile
+-profile
+-sim
+-a6
+-toggle=deadbeef=1
+-Xtimer0
+-simextp=/home/embsys/extensions/embsys_pager.so,RAM=1
+-simextp=/home/embsys/extensions/embsys_flash.so,size=16
+-simextp=/home/embsys/extensions/embsys_uart.so
+-simextp=/home/embsys/extensions/embsys_halt.so
+-mem=0

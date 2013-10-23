@@ -1,0 +1,50 @@
+fedidat goldberg
+
+Names and IDs:
+Benjamin FEDIDAT 7665692
+Yitzhak GOLDBERG 302916036
+ 
+Embedded Systems, JCT 2013, exercise 4
+Description: SMS flash storage, optimizations.
+
+Usage:
+"make", then "make debug" or "make run"
+
+Contents: 
+	README							- this file 
+	makefile     					- a makefile
+	device.svr3						- segment memory map
+	ivt.s							- interrupt vector table
+	ex3.c							- main program
+    embsys_utilities.c/h     		- tools used accross the files
+	embsys_timer.c/h				- timer driver
+	embsys_panel.c/h				- input panel driver
+	embsys_display.c/h				- display driver
+	embsys_network.c/h				- network card driver
+	embsys_sms_protocol.c/h			- sms protocol implementation
+	embsys_sms.c/h					- implementation of the sms module for the device
+	**NEW** embsys_flash.c/h		- back from exercise 2, NOR flash driver
+	**NEW** embsys_persistence.c/h	- implements SMS persistence using NOR flash 
+	tx.a							- ThreadX compiled and linked library
+	tx_api.h						- ThreadX API
+	tx_port.h						- port of ThreadX for ARC enviroment
+	ex3.args						- arguments for debugging with mdb
+	
+Notes:
+
+Our device ID is still 07665692. Notice that this exercise is done with Yitzhak Goldberg instead of Avramm Waller.
+The slave mode is not available, but it is not required as it was only a bonus in ex3.
+
+PERSISTENCE: The persistence is completely failsafe, it was written with the help of someone from the course, and metadata makes sure that the device cannot fail to parse a message, despite the use of NOR flash (which makes writing bits only work from 0 to 1, block erase is required for the other way). In order to accomplish this, we had to take care of place and integrity:
+*Place: we write messages inside blocks (called erase units) until there is a lack of place. At that point, we try to compact a block by moving around messages, erasing it and using it for the new message.
+*Integrity: we use a "valid" bit to "commit" changes and an "obsolete" bit to remove messages. Since these actions are atomic (take one flash operation), there is no possibility of failure. Indeed, if a file is tainted but not valid or obsolete, we discard it. Additionally, if the flash is somehow corrupted, a "canary value" is used in the header, which, if changed more than once, will alert us of an outside change.
+
+OPTIMIZATIONS: 
+a. Minimize used ROM size: The ROM only takes 32KB, which is quite an achievement, accomplished with concise code. You can verify this by typing "objdump a.out -h", and checking the sizes of .text and .rodata, which make up the ROM together, and amount to 30316 bytes combined.
+b. Minimize used RAM size: Data structures are all relatively small, and allocation seemed reasonable overall. The one large data structure we used is the flash header storage, but it allows us to save many costly flash operations. As for TX threads, each one uses the minimum 1KB size. As for stack and heap, objdump indicate 1400 bytes, but I could not test since the SMSC is down right now, which breaks the program.
+c. Minimize used FLASH size: Thanks to the great flexibility of the persistence design, it is easy to change the number of 4KB blocks available to the persistence module: just open embsys_flash.h and modifying line 5 to "#define FLASH_CAPACITY (X*4*1024)", where X is the number of blocks. In order to achieve 100 messages with this design, only 6 blocks are required (out of 16 available initially!).
+2. Optimize power consumption: all threads wait on event flags for every I/O activity (flash, pad, display, network), so there is no busy waiting whatsoever. Additionally, the processor sleeps when idle (when there is no activity) on a thread running on the lowest priority, using the _sleep function, as instructed.
+
+Sadly, I could not complete the bootloader bonus, mainly because I did not know how to launch code from memory after fetching it from flash.
+
+Thank you for this course.

@@ -32,11 +32,11 @@ static const int digits[16] =
 	/* f */ LED_A                         | LED_E | LED_F | LED_G
 };
 
-void embsys_7segments_write(char value)
+void embsys_7segments_write(char tens_value, char units_value)
 {
-	/*set unit digit, lower nibble*/
-	_sr(UNITS_DIGIT | digits[(value & 0x0F)], EMBSYS_7SEGMENTS_ADDR);
 	/*set tens digit, upper nibble*/
-	_sr(TENS_DIGIT | digits[(value >> 4) & 0x0F], EMBSYS_7SEGMENTS_ADDR);
+	_sr(TENS_DIGIT | (tens_value & 0x7F), EMBSYS_7SEGMENTS_ADDR);
+	/*set unit digit, lower nibble*/
+	_sr(UNITS_DIGIT | (units_value & 0x7F), EMBSYS_7SEGMENTS_ADDR);
 }
 
